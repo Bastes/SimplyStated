@@ -21,5 +21,13 @@ module SimplyStated
     def state
       @state
     end
+
+    def method_missing(method_name, *args)
+      if transition = @state.transitions(method_name)
+        @state = @@state_machine.states(transition.destination)
+      else
+        raise NoMethodError.new("NoMethodError: undefined method `#{method_name}' for #{inspect}")
+      end
+    end
   end
 end

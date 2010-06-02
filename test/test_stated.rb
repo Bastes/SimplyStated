@@ -29,9 +29,19 @@ class TestStated < Test::Unit::TestCase
       }
     }
 
-    context("once instanciated") {
+    context(", once instanciated") {
       setup { @machine_instance = @machine_class.new }
       should("start with the first state described by default") {
+        assert_equal :initial, @machine_instance.state.name
+      }
+      should("change state given the right message") {
+        @machine_instance.goto_other
+        assert_equal :other, @machine_instance.state.name
+        @machine_instance.goto_initial
+        assert_equal :initial, @machine_instance.state.name
+      }
+      should("not accept messages for another state") {
+        assert_raise(NoMethodError) { @machine_instance.goto_initial }
         assert_equal :initial, @machine_instance.state.name
       }
     }
