@@ -1,10 +1,10 @@
 module SimplyStated
   class Transition
-    attr_reader :message, :to_state
+    attr_reader :message, :destination
 
-    def initialize(message, to_state)
+    def initialize(message, destination)
       @message = message
-      @to_state = to_state
+      @destination = destination
     end
   end
 end

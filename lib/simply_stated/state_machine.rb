@@ -11,6 +11,14 @@ module SimplyStated
       @states.first
     end
 
+    def states(name = nil)
+      if name
+        @states.detect { |s| s.name == name }
+      else
+        @states
+      end
+    end
+    
     protected
 
     def state(name, &block)

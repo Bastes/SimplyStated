@@ -4,8 +4,12 @@ module SimplyStated
   module Stated
     def self.included(base)
       base.class_eval {
-        def self.states(&block)
+        def self.describe_states(&block)
           @@state_machine = SimplyStated::StateMachine.new(&block)
+        end
+
+        def self.states(*args)
+          @@state_machine.states(*args)
         end
       }
     end
