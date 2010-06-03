@@ -26,7 +26,7 @@ module SimplyStated
       if transition = @state.transitions(method_name)
         @state = @@state_machine.states(transition.destination)
       else
-        raise NoMethodError.new("NoMethodError: undefined method `#{method_name}' for #{inspect}")
+        super
       end
     end
   end
