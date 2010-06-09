@@ -7,7 +7,7 @@ module SimplyStated
     def initialize(name, &block)
       @name = name
       @transitions = []
-      instance_eval &block
+      yield self
     end
 
     def transitions(message = nil)
@@ -18,8 +18,6 @@ module SimplyStated
       end
     end
     
-    protected
-
     def transition(message, destination, &block)
       @transitions << Transition.new(message, destination, &block)
     end

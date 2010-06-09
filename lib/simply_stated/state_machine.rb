@@ -4,7 +4,7 @@ module SimplyStated
   class StateMachine
     def initialize(&block)
       @states = []
-      instance_eval &block
+      yield self
     end
 
     def initial
@@ -19,8 +19,6 @@ module SimplyStated
       end
     end
     
-    protected
-
     def state(name, &block)
       @states << State.new(name, &block)
     end

@@ -5,12 +5,12 @@ class TestStated < Test::Unit::TestCase
     setup {
       @machine_class = Class.new {
         include SimplyStated::Stated
-        describe_states {
-          state(:initial) {
-            transition :goto_other, :other
+        describe_states { |m|
+          m.state(:initial) { |s|
+            s.transition :goto_other, :other
           }
-          state(:other) {
-            transition :goto_initial, :initial
+          m.state(:other) { |s|
+            s.transition :goto_initial, :initial
           }
         }
       }
@@ -48,24 +48,24 @@ class TestStated < Test::Unit::TestCase
   }
   context("A simple machine with transition callbacks") {
     setup {
-      @transition_hook = transition_hook = lambda {
-        @passed += 1
+      @transition_hook = transition_hook = lambda { |m, *n|
+        m.passed += n.first || 1
       }
       @machine_class = Class.new {
         include SimplyStated::Stated
-        attr_reader :passed
+        attr_accessor :passed
 
         def initialize
           super
           @passed = 0
         end
 
-        describe_states {
-          state(:initial) {
-            transition(:goto_other, :other, &transition_hook)
+        describe_states { |d|
+          d.state(:initial) { |s|
+            s.transition(:goto_other, :other, &transition_hook)
           }
-          state(:other) {
-            transition(:goto_initial, :initial, &transition_hook)
+          d.state(:other) { |s|
+            s.transition(:goto_initial, :initial, &transition_hook)
           }
         }
       }
@@ -80,8 +80,8 @@ class TestStated < Test::Unit::TestCase
       assert_equal 0, @machine_instance.passed
       @machine_instance.goto_other
       assert_equal 1, @machine_instance.passed
-      @machine_instance.goto_initial
-      assert_equal 2, @machine_instance.passed
+      @machine_instance.goto_initial 2
+      assert_equal 3, @machine_instance.passed
     }
   }
 end
