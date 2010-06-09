@@ -20,8 +20,8 @@ module SimplyStated
     
     protected
 
-    def transition(message, destination)
-      @transitions << Transition.new(message, destination)
+    def transition(message, destination, &block)
+      @transitions << Transition.new(message, destination, &block)
     end
   end
 end

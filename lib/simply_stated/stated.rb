@@ -24,7 +24,9 @@ module SimplyStated
 
     def method_missing(method_name, *args)
       if transition = @state.transitions(method_name)
-        @state = @@state_machine.states(transition.destination)
+        if ! transition.callback || transition.callback.call
+          @state = @@state_machine.states(transition.destination)
+        end
       else
         super
       end
