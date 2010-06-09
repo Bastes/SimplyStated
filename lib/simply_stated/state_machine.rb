@@ -19,8 +19,8 @@ module SimplyStated
       end
     end
     
-    def state(name, &block)
-      @states << State.new(name, &block)
+    def state(name, *options, &block)
+      @states << State.new(name, *options, &block)
     end
   end
 end

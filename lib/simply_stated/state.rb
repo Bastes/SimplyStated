@@ -2,11 +2,13 @@ require 'simply_stated/transition'
 
 module SimplyStated
   class State
-    attr_reader :name
+    attr_reader :name, :enter
 
-    def initialize(name, &block)
+    def initialize(name, *options, &block)
+      options = options.first || {}
       @name = name
       @transitions = []
+      @enter = options[:enter]
       yield self
     end
 

@@ -26,6 +26,7 @@ module SimplyStated
       if transition = @state.transitions(method_name)
         if ! transition.callback || transition.callback.call(self, *args)
           @state = @@state_machine.states(transition.destination)
+          @state.enter.call(self) if @state.enter
         end
       else
         super

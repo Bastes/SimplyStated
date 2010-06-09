@@ -103,4 +103,41 @@ class TestStated < Test::Unit::TestCase
       assert_equal 0, @machine_instance.passed
     }
   }
+  context("A simple machine with state enter callbacks") {
+    setup {
+      @enter_hook = enter_hook = lambda { |m|
+        m.passed += 1
+      }
+      @machine_class = Class.new {
+        include SimplyStated::Stated
+        attr_accessor :passed
+
+        def initialize
+          super
+          @passed = 0
+        end
+
+        describe_states { |d|
+          d.state(:initial, :enter => enter_hook) { |s|
+            s.transition(:goto_other, :other)
+          }
+          d.state(:other, :enter => enter_hook) { |s|
+            s.transition(:goto_initial, :initial)
+          }
+        }
+      }
+      @machine_instance = @machine_class.new
+    }
+    should("not execute the callback when entering the initial state for the first time") {
+      assert_equal :initial, @machine_instance.state.name
+      assert_equal 0, @machine_instance.passed
+    }
+    should("execute the callback when entering states") {
+      assert_equal :initial, @machine_instance.state.name
+      assert_equal 0, @machine_instance.passed
+      @machine_instance.goto_other
+      assert_equal :other, @machine_instance.state.name
+      assert_equal 1, @machine_instance.passed
+    }
+  }
 end
