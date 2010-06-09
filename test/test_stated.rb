@@ -49,7 +49,12 @@ class TestStated < Test::Unit::TestCase
   context("A simple machine with transition callbacks") {
     setup {
       @transition_hook = transition_hook = lambda { |m, *n|
-        m.passed += n.first || 1
+        n = n.first || 1
+        if n > 0
+          m.passed += n
+        else
+          false
+        end
       }
       @machine_class = Class.new {
         include SimplyStated::Stated
@@ -77,11 +82,25 @@ class TestStated < Test::Unit::TestCase
       }
     }
     should("execute the callback on each transition") {
+      assert_equal :initial, @machine_instance.state.name
       assert_equal 0, @machine_instance.passed
       @machine_instance.goto_other
+      assert_equal :other, @machine_instance.state.name
       assert_equal 1, @machine_instance.passed
-      @machine_instance.goto_initial 2
-      assert_equal 3, @machine_instance.passed
+    }
+    should("accept arguments on transitions calls") {
+      assert_equal :initial, @machine_instance.state.name
+      assert_equal 0, @machine_instance.passed
+      @machine_instance.goto_other 2
+      assert_equal :other, @machine_instance.state.name
+      assert_equal 2, @machine_instance.passed
+    }
+    should("stay on state when callback returns false") {
+      assert_equal :initial, @machine_instance.state.name
+      assert_equal 0, @machine_instance.passed
+      @machine_instance.goto_other -1
+      assert_equal :initial, @machine_instance.state.name
+      assert_equal 0, @machine_instance.passed
     }
   }
 end
