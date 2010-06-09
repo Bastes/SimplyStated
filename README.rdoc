@@ -1,17 +1,42 @@
 = SimplyStated
 
-Description goes here.
+Simply stated is a simple yet extensible API to define state machine behaviour
+when creating a class.
 
-== Note on Patches/Pull Requests
+== Getting started
  
-* Fork the project.
-* Make your feature addition or bug fix.
-* Add tests for it. This is important so I don't break it in a
-  future version unintentionally.
-* Commit, do not mess with rakefile, version, or history.
-  (if you want to have your own version, that is fine but bump version in a commit by itself I can ignore when I pull)
-* Send me a pull request. Bonus points for topic branches.
+It's quite easy ; let's imagine a simple state machine with 2 states and one
+transition by state :
+            ---goto_other-->
+  [initial]                  [other]
+            <-goto_initial--
 
-== Copyright
+You can define it as follows :
+  class Machine
+    include SimplyStated::Stated
+    define_states do |d|
+      d.state :initial do |s|
+        s.transition :goto_other, :other
+      end
+      d.state :other do |s|
+        s.transition :goto_initial, :initial
+      end
+    end
+  end
 
-Copyright (c) 2010 Michel Belleville. See LICENSE for details.
+Then, you can use as follows :
+  > machine = Machine.new
+  > machine.state.name
+  => :initial
+  > machine.goto_other
+  > machine.state.name
+  => :other
+  > machine.goto_initial
+  > machine.state.name
+  => :initial
+
+==License
+
+Wanna read, use, reuse, change ? By all means please do, it's under GPL V3.
+
+see link:LICENSE for more details about the GPL V3, it's pretty awesome
