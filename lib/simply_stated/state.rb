@@ -9,15 +9,15 @@ module SimplyStated
     attr_reader :name
     # callback triggered when entering the state
     attr_reader :enter
-    # callback triggered when exiting the state
-    attr_reader :exit
+    # callback triggered when leaveing the state
+    attr_reader :leave
     # true when the state is the inital state of the machine
     attr_reader :initial
 
     # Creating a new state, a name is required (unique in the state's context),
     # some options may be set in an hash :
     # initial:: true when the state should be the inital state in its context
-    # enter, exit:: callbacks triggered when entering or leaving the state
+    # enter, leave:: callbacks triggered when entering or leaving the state
     # 
     # Transitions are defined in the block using this instance's transition
     # method.
@@ -27,7 +27,7 @@ module SimplyStated
       @transitions = []
       @initial = options[:initial]
       @enter = options[:enter]
-      @exit = options[:exit]
+      @leave = options[:leave]
       yield self
     end
 

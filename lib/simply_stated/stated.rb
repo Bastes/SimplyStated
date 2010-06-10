@@ -41,9 +41,9 @@ module SimplyStated
   #         # ...
   #       end
   #
-  #       # this state has an exit hook ; exit hooks are triggered when the
-  #       # machine exits the state
-  #       d.state(:state_3, :exit => lambda { |m| m.do_something_else }) do
+  #       # this state has a leave hook ; leave hooks are triggered when the
+  #       # machine leaves the state
+  #       d.state(:state_3, :leave => lambda { |m| m.do_something_else }) do
   #         # ...
   #       end
   #     end
@@ -82,7 +82,7 @@ module SimplyStated
     def method_missing(method_name, *args) # :nodoc:
       if transition = @state.transitions(method_name)
         if ! transition.callback || transition.callback.call(self, *args)
-          @state.exit.call(self) if @state.exit
+          @state.leave.call(self) if @state.leave
           @state = @@state_machine.states(transition.destination)
           @state.enter.call(self) if @state.enter
         end

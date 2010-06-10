@@ -168,9 +168,9 @@ class TestStated < Test::Unit::TestCase
       assert_equal 1, @machine_instance.passed
     }
   }
-  context("A simple machine with state exit callbacks") {
+  context("A simple machine with state leave callbacks") {
     setup {
-      @exit_hook = exit_hook = lambda { |m|
+      @leave_hook = leave_hook = lambda { |m|
         m.passed += 1
       }
       @machine_class = Class.new {
@@ -183,10 +183,10 @@ class TestStated < Test::Unit::TestCase
         end
 
         describe_states { |d|
-          d.state(:initial, :exit => exit_hook) { |s|
+          d.state(:initial, :leave => leave_hook) { |s|
             s.transition(:goto_other, :other)
           }
-          d.state(:other, :exit => exit_hook) { |s|
+          d.state(:other, :leave => leave_hook) { |s|
             s.transition(:goto_initial, :initial)
           }
         }
@@ -195,10 +195,10 @@ class TestStated < Test::Unit::TestCase
     }
     should("keep the callbacks") {
       @machine_class.states.each { |state|
-        assert_equal @exit_hook, state.exit
+        assert_equal @leave_hook, state.leave
       }
     }
-    should("execute the callback when exiting states") {
+    should("execute the callback when leaving states") {
       assert_equal :initial, @machine_instance.state.name
       assert_equal 0, @machine_instance.passed
       @machine_instance.goto_other
@@ -206,7 +206,7 @@ class TestStated < Test::Unit::TestCase
       assert_equal 1, @machine_instance.passed
     }
   }
-  context("A simple machine with state transitions, enter and exit callbacks") {
+  context("A simple machine with state transitions, enter and leave callbacks") {
     setup {
       transition_hook = lambda { |m, *args|
         if args.first == true
@@ -220,15 +220,15 @@ class TestStated < Test::Unit::TestCase
         m.order += 1
         m.enter_passed = m.order
       }
-      exit_hook = lambda { |m|
+      leave_hook = lambda { |m|
         m.order += 1
-        m.exit_passed = m.order
+        m.leave_passed = m.order
       }
       @machine_class = Class.new {
         include SimplyStated::Stated
         attr_accessor :transition_passed,
                       :enter_passed,
-                      :exit_passed,
+                      :leave_passed,
                       :order
 
         def initialize
@@ -237,10 +237,10 @@ class TestStated < Test::Unit::TestCase
         end
 
         describe_states { |d|
-          d.state(:initial, :enter => enter_hook, :exit => exit_hook) { |s|
+          d.state(:initial, :enter => enter_hook, :leave => leave_hook) { |s|
             s.transition(:goto_other, :other, &transition_hook)
           }
-          d.state(:other, :enter => enter_hook, :exit => exit_hook) { |s|
+          d.state(:other, :enter => enter_hook, :leave => leave_hook) { |s|
             s.transition(:goto_initial, :initial, &transition_hook)
           }
         }
@@ -251,9 +251,9 @@ class TestStated < Test::Unit::TestCase
       setup {
         @machine_instance.goto_other
       }
-      should("execute the transition, exit and enter hooks in this order") {
+      should("execute the transition, leave and enter hooks in this order") {
         assert_equal 1, @machine_instance.transition_passed
-        assert_equal 2, @machine_instance.exit_passed
+        assert_equal 2, @machine_instance.leave_passed
         assert_equal 3, @machine_instance.enter_passed
       }
     }
@@ -263,7 +263,7 @@ class TestStated < Test::Unit::TestCase
       }
       should("execute none of the hooks") {
         assert_equal nil, @machine_instance.transition_passed
-        assert_equal nil, @machine_instance.exit_passed
+        assert_equal nil, @machine_instance.leave_passed
         assert_equal nil, @machine_instance.enter_passed
       }
     }
