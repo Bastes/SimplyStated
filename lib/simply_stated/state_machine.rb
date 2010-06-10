@@ -8,7 +8,7 @@ module SimplyStated
     end
 
     def initial
-      @states.first
+      @states.detect { |state| state.initial } || @states.first
     end
 
     def states(name = nil)

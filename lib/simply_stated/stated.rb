@@ -11,6 +11,10 @@ module SimplyStated
         def self.states(*args)
           @@state_machine.states(*args)
         end
+
+        def self.initial
+          @@state_machine.initial
+        end
       }
     end
 

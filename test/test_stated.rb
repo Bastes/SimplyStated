@@ -28,7 +28,6 @@ class TestStated < Test::Unit::TestCase
         }
       }
     }
-
     context(", once instanciated") {
       setup { @machine_instance = @machine_class.new }
       should("start with the first state described by default") {
@@ -43,6 +42,30 @@ class TestStated < Test::Unit::TestCase
       should("not accept messages for another state") {
         assert_raise(NoMethodError) { @machine_instance.goto_initial }
         assert_equal :initial, @machine_instance.state.name
+      }
+    }
+  }
+  context("A simple machine with explicit initial state") {
+    setup {
+      @machine_class = Class.new {
+        include SimplyStated::Stated
+        describe_states { |m|
+          m.state(:not_initial) { |s|
+            s.transition :goto_other, :other
+          }
+          m.state(:other, :initial => true) { |s|
+            s.transition :goto_not_initial, :not_initial
+          }
+        }
+      }
+    }
+    should("recognize the right state as initial") {
+      assert_equal :other, @machine_class.initial.name
+    }
+    context(", once instanciated") {
+      setup { @machine_instance = @machine_class.new }
+      should("start with the right first state") {
+        assert_equal :other, @machine_instance.state.name
       }
     }
   }
