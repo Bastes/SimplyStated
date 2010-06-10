@@ -12,6 +12,7 @@ transition by state :
             <-goto_initial--
 
 You can define it as follows :
+  require 'simply_stated'
   class Machine
     include SimplyStated::Stated
     define_states do |d|
@@ -34,6 +35,8 @@ Then, you can use as follows :
   > machine.goto_initial
   > machine.state.name
   => :initial
+
+See SimplyStated::Stated for a fuller exemple.
 
 ==License
 
