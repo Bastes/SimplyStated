@@ -128,6 +128,11 @@ class TestStated < Test::Unit::TestCase
       }
       @machine_instance = @machine_class.new
     }
+    should("keep the callbacks") {
+      @machine_class.states.each { |state|
+        assert_equal @enter_hook, state.enter
+      }
+    }
     should("not execute the callback when entering the initial state for the first time") {
       assert_equal :initial, @machine_instance.state.name
       assert_equal 0, @machine_instance.passed
@@ -165,12 +170,79 @@ class TestStated < Test::Unit::TestCase
       }
       @machine_instance = @machine_class.new
     }
+    should("keep the callbacks") {
+      @machine_class.states.each { |state|
+        assert_equal @exit_hook, state.exit
+      }
+    }
     should("execute the callback when exiting states") {
       assert_equal :initial, @machine_instance.state.name
       assert_equal 0, @machine_instance.passed
       @machine_instance.goto_other
       assert_equal :other, @machine_instance.state.name
       assert_equal 1, @machine_instance.passed
+    }
+  }
+  context("A simple machine with state transitions, enter and exit callbacks") {
+    setup {
+      transition_hook = lambda { |m, *args|
+        if args.first == true
+          false
+        else
+          m.order += 1
+          m.transition_passed = m.order
+        end
+      }
+      enter_hook = lambda { |m|
+        m.order += 1
+        m.enter_passed = m.order
+      }
+      exit_hook = lambda { |m|
+        m.order += 1
+        m.exit_passed = m.order
+      }
+      @machine_class = Class.new {
+        include SimplyStated::Stated
+        attr_accessor :transition_passed,
+                      :enter_passed,
+                      :exit_passed,
+                      :order
+
+        def initialize
+          super
+          @order = 0
+        end
+
+        describe_states { |d|
+          d.state(:initial, :enter => enter_hook, :exit => exit_hook) { |s|
+            s.transition(:goto_other, :other, &transition_hook)
+          }
+          d.state(:other, :enter => enter_hook, :exit => exit_hook) { |s|
+            s.transition(:goto_initial, :initial, &transition_hook)
+          }
+        }
+      }
+      @machine_instance = @machine_class.new
+    }
+    context("when the transition succeeds") {
+      setup {
+        @machine_instance.goto_other
+      }
+      should("execute the transition, exit and enter hooks in this order") {
+        assert_equal 1, @machine_instance.transition_passed
+        assert_equal 2, @machine_instance.exit_passed
+        assert_equal 3, @machine_instance.enter_passed
+      }
+    }
+    context("when the transition fails") {
+      setup {
+        @machine_instance.goto_other true
+      }
+      should("execute none of the hooks") {
+        assert_equal nil, @machine_instance.transition_passed
+        assert_equal nil, @machine_instance.exit_passed
+        assert_equal nil, @machine_instance.enter_passed
+      }
     }
   }
 end
