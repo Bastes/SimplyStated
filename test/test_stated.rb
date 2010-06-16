@@ -268,4 +268,43 @@ class TestStated < Test::Unit::TestCase
       }
     }
   }
+  context("A simple machine with sub-states") {
+    setup {
+      @machine_class = Class.new {
+        include SimplyStated::Stated
+
+        describe_states { |d|
+          d.state(:super_initial) { |us|
+            us.state(:initial) { |s|
+              s.transition(:goto_other, :other) }
+            us.state(:other) { |s|
+              s.transition(:goto_initial, :initial) }
+            us.transition(:goto_super_other, :super_other) }
+          d.state(:super_other) { |us|
+            us.state(:initial) { |s|
+              s.transition(:goto_other, :other) }
+            us.state(:other) { |s|
+              s.transition(:goto_initial, :initial) }
+            us.transition(:goto_super_initial, :super_initial) }
+        }
+      }
+    }
+    should("keep its structure") {
+      assert_equal 2, @machine_class.states.length
+      assert_equal [:super_initial, :super_other],
+        @machine_class.states.map { |state| state.name }
+      @machine_class.states.each { |super_state|
+        assert_equal 2, super_state.states.length
+        assert_equal [:initial, :other],
+          super_state.states.map { |state| state.name }
+      }
+    }
+    context("once instanciated, ") {
+      setup { @machine_instance = @machine_class.new }
+      should("start on the appropriate initial super state and sub state") {
+        assert_equal :initial, @machine_instance.state.name
+        assert_equal :super_initial, @machine_instance.state.sup.name
+      }
+    }
+  }
 end

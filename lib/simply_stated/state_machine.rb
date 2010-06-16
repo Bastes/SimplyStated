@@ -15,7 +15,7 @@ module SimplyStated
 
     # Returns the initial state of the machine
     def initial
-      @states.detect { |state| state.initial? } || @states.first
+      (@states.detect { |state| state.initial? } || @states.first).initial
     end
 
     # Returns the list of all states of the machine, or just the state with
