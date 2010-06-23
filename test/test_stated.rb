@@ -305,6 +305,18 @@ class TestStated < Test::Unit::TestCase
         assert_equal :initial, @machine_instance.state.name
         assert_equal :super_initial, @machine_instance.state.sup.name
       }
+      context("trying to change states") {
+        should("be able to move from one substate to the other in the same super state") {
+          @machine_instance.goto_other
+          assert_equal :other, @machine_instance.state.name
+          assert_equal :super_initial, @machine_instance.state.sup.name
+        }
+        should("be able to move from one superstate to the other") {
+          @machine_instance.goto_super_other
+          assert_equal :initial, @machine_instance.state.name
+          assert_equal :super_other, @machine_instance.state.sup.name
+        }
+      }
     }
   }
 end
