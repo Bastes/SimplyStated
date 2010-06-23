@@ -11,8 +11,6 @@ module SimplyStated
     attr_reader :enter
     # callback triggered when leaveing the state
     attr_reader :leave
-    # true when the state is the inital state of the machine
-    attr_reader :initial
 
     # Creating a new state, a name is required (unique in the state's context),
     # some options may be set in an hash :
@@ -46,6 +44,11 @@ module SimplyStated
     # see SimplyStated::Transition.new
     def transition(message, destination, &block) # :yields: transition
       @transitions << Transition.new(message, destination, &block)
+    end
+
+    # Returns true if this is the initial state
+    def initial?
+      @initial || false
     end
   end
 end
