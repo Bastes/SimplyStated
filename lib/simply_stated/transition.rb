@@ -17,9 +17,10 @@ module SimplyStated
     # The optional block will provide a callback triggered when the transition
     # is triggered by the machine, and receives the machine's instance as first
     # argument, and optionnaly other arguments provided by the transition call.
-    def initialize(message, destination, &callback) # :yields: machine_instance, *args
-      @message = message
-      @destination = destination
+    def initialize(*args, &callback) # :yields: machine_instance, *args
+      args = args.first
+      @message = args.keys.first
+      @destination = args.values.first
       @callback = callback if block_given?
     end
   end

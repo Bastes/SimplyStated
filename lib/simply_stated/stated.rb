@@ -76,7 +76,7 @@ module SimplyStated
 
     # Returns the state the machine is currently in
     def state
-      @state
+      @state.name
     end
 
     def method_missing(method_name, *args) # :nodoc:

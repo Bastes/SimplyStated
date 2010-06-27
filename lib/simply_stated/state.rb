@@ -63,8 +63,8 @@ module SimplyStated
     # Defines a transition in this state
     #
     # see SimplyStated::Transition.new
-    def transition(message, destination, &block) # :yields: transition
-      @transitions << Transition.new(message, destination, &block)
+    def transition(*args, &block) # :yields: transition
+      @transitions << Transition.new(*args, &block)
     end
 
     # Returns true if this is the initial state

@@ -31,8 +31,8 @@ module SimplyStated
     # Defines a state
     # 
     # see SimplyStated::State.new
-    def state(name, *options, &block) # :yields: state
-      @states << State.new(name, *options, &block)
+    def state(*options, &block) # :yields: state
+      @states << State.new(*options, &block)
     end
   end
 end
